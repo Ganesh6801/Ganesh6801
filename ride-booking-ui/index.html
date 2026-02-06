@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ride Booking UI</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Leaflet (OpenStreetMap) -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+      defer
+    ></script>
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <i class="fa-solid fa-taxi"></i>
+        <span>Ride</span>
+      </div>
+      <nav class="nav-actions">
+        <button id="themeToggle" class="icon-btn" title="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="primary ghost">Help</button>
+      </nav>
+    </header>
+
+    <main class="layout">
+      <section class="panel panel-left">
+        <div class="booking-card">
+          <div class="booking-type">
+            <button id="rideNowBtn" class="chip active">Ride now</button>
+            <button id="scheduleBtn" class="chip">Schedule</button>
+            <input id="scheduleTime" type="datetime-local" class="hidden" />
+          </div>
+
+          <div class="input-group">
+            <label for="pickupInput"><i class="fa-solid fa-circle-dot pickup"></i> Pickup</label>
+            <div class="input-row">
+              <input id="pickupInput" type="text" placeholder="Enter pickup location" autocomplete="off" />
+              <button id="useMyLocation" class="icon-btn" title="Use my location"><i class="fa-solid fa-location-crosshairs"></i></button>
+            </div>
+            <div id="pickupSuggest" class="suggestions"></div>
+          </div>
+
+          <div class="input-group">
+            <label for="dropInput"><i class="fa-solid fa-location-dot drop"></i> Drop</label>
+            <div class="input-row">
+              <input id="dropInput" type="text" placeholder="Enter drop location" autocomplete="off" />
+            </div>
+            <div id="dropSuggest" class="suggestions"></div>
+          </div>
+
+          <div class="inline-fields">
+            <div class="input-group small">
+              <label for="passengers"><i class="fa-solid fa-users"></i> Passengers</label>
+              <select id="passengers">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+              </select>
+            </div>
+            <div class="input-group small readouts">
+              <div class="readout" title="Estimated distance"><i class="fa-solid fa-ruler-combined"></i> <span id="distanceDisplay">-</span></div>
+              <div class="readout" title="Estimated time"><i class="fa-solid fa-clock"></i> <span id="timeDisplay">-</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rides-card">
+          <h3>Choose a ride</h3>
+          <div class="rides">
+            <button class="ride-option" data-type="economy">
+              <div class="ride-icon"><i class="fa-solid fa-car-side"></i></div>
+              <div class="ride-meta">
+                <div class="ride-name">Economy</div>
+                <div class="ride-desc">Affordable, 1-3 passengers</div>
+              </div>
+              <div class="ride-price" id="fare-economy">-</div>
+            </button>
+
+            <button class="ride-option" data-type="sedan">
+              <div class="ride-icon"><i class="fa-solid fa-car"></i></div>
+              <div class="ride-meta">
+                <div class="ride-name">Sedan</div>
+                <div class="ride-desc">Comfort, extra legroom</div>
+              </div>
+              <div class="ride-price" id="fare-sedan">-</div>
+            </button>
+
+            <button class="ride-option" data-type="xl">
+              <div class="ride-icon"><i class="fa-solid fa-van-shuttle"></i></div>
+              <div class="ride-meta">
+                <div class="ride-name">XL</div>
+                <div class="ride-desc">Spacious, up to 6</div>
+              </div>
+              <div class="ride-price" id="fare-xl">-</div>
+            </button>
+          </div>
+
+          <button id="confirmBtn" class="primary large" disabled>
+            Confirm booking
+          </button>
+        </div>
+      </section>
+
+      <section class="panel panel-right">
+        <div id="map" class="map"></div>
+        <div class="map-legend">
+          <span><i class="fa-solid fa-circle-dot pickup"></i> Pickup</span>
+          <span><i class="fa-solid fa-location-dot drop"></i> Drop</span>
+          <span><i class="fa-solid fa-hand-pointer"></i> Click map to set</span>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-dialog" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <h3 id="modalTitle">Booking confirmed</h3>
+          <button id="closeModal" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="driver-card">
+            <div class="avatar">SJ</div>
+            <div class="driver-info">
+              <div class="driver-name">Sanjay Kumar</div>
+              <div class="driver-meta">Hyundai Aura • KA 01 AB 1234 • 4.9★</div>
+            </div>
+            <div class="eta">
+              <i class="fa-solid fa-clock"></i>
+              <span id="driverEta">5 min</span>
+            </div>
+          </div>
+          <div class="trip-summary">
+            <div class="row"><span>Pickup</span><strong id="summaryPickup">-</strong></div>
+            <div class="row"><span>Drop</span><strong id="summaryDrop">-</strong></div>
+            <div class="row"><span>Ride</span><strong id="summaryRide">-</strong></div>
+            <div class="row total"><span>Fare</span><strong id="summaryFare">-</strong></div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="ghost" id="cancelRide">Cancel ride</button>
+          <button class="primary" id="okRide">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
