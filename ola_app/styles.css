@@ -1,0 +1,92 @@
+/* Global Styles */
+body {
+  font-family: "Inter", sans-serif;
+  background: #f5f7fa;
+  color: #202124;
+  margin: 0;
+  padding: 0;
+}
+
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+header h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #0077ff;
+}
+
+/* Form */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccd1d9;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+button {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#estimateBtn {
+  background: #0077ff;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+#estimateBtn:hover {
+  background: #0066d4;
+}
+
+#bookBtn {
+  background: #00c853;
+  color: #fff;
+}
+
+#bookBtn:hover {
+  background: #00a140;
+}
+
+.fare-estimate {
+  padding: 1rem;
+  background: #fff;
+  border: 1px dashed #00c853;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Footer */
+footer {
+  margin-top: 4rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #666;
+}
